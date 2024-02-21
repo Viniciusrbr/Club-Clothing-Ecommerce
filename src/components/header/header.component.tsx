@@ -8,6 +8,9 @@ import {
   HeaderTitle
 } from './header.styles'
 
+import { signOut } from 'firebase/auth'
+import { auth } from '../../config/firebase.config'
+
 const Header = () => {
   const navigate = useNavigate()
 
@@ -26,6 +29,7 @@ const Header = () => {
       <HeaderItems>
         <HeaderItem>Explorar</HeaderItem>
         <HeaderItem onClick={handleLoginClick} >Login</HeaderItem>
+        <HeaderItem onClick={() => signOut(auth)}>Sair</HeaderItem>
         <HeaderItem onClick={handleSignUpClick} >Criar Conta</HeaderItem>
         <HeaderItem>
           <BsCart3 size={25} />

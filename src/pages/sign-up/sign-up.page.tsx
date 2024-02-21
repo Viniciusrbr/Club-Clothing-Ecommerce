@@ -16,7 +16,7 @@ import {
     SignUpInputContainer
 } from './sign-up.styles'
 
-//firebase
+// Firebase
 import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth, db } from '../../config/firebase.config'
 import { addDoc, collection } from 'firebase/firestore'
