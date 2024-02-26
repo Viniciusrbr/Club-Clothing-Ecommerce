@@ -2,7 +2,7 @@ import { BsGoogle } from 'react-icons/bs'
 import { FiLogIn } from 'react-icons/fi'
 import { useForm } from 'react-hook-form'
 import validator from 'validator'
-import { useEffect, useContext } from 'react'
+import { useEffect, useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // Components
@@ -10,6 +10,7 @@ import CustomButton from '../../components/custom-button/custom-button.component
 import CustomInput from '../../components/custom-input/custom-input.component'
 import Header from '../../components/header/header.component'
 import InputErrorMessage from '../../components/input-error-message/input-error-message.component'
+import Loading from '../../components/loading/loading.component'
 
 // Styles
 import {
@@ -46,6 +47,8 @@ const LoginPage = () => {
         formState: { errors }
     } = useForm<LoginForm>()
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const { isAuthenticated } = useContext(UserContext)
 
     const navigate = useNavigate()
@@ -58,6 +61,7 @@ const LoginPage = () => {
 
     const handleSubmitPress = async (data: LoginForm) => {
         try {
+            setIsLoading(true)
             const userCredentials = await signInWithEmailAndPassword(
                 auth,
                 data.email,
@@ -79,11 +83,14 @@ const LoginPage = () => {
                 setError('email', { type: 'invalid' })
                 setError('password', { type: 'invalid' })
             }
+        } finally {
+            setIsLoading(false)
         }
     }
 
     const handleSignInWithGooglePress = async () => {
         try {
+            setIsLoading(true)
             const userCredentials = await signInWithPopup(auth, googleProvider)
 
             const querySnapshot = await getDocs(
@@ -109,12 +116,16 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.log(error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
     return (
         <>
             <Header />
+
+            {isLoading && <Loading />}
 
             <LoginContainer>
                 <LoginContent>
