@@ -6,8 +6,12 @@ import { Container } from './categories-overview.styles'
 // Utilities
 import { CategoryContext } from '../../contexts/category.context'
 
+// Components
+import CategoryOverview from '../category-overview/category-overview.component'
+import Loading from '../loading/loading.component'
+
 const CategoriesOverview: FunctionComponent = () => {
-    const { categories, fetchCategories } = useContext(CategoryContext)
+    const { categories, isLoading, fetchCategories } = useContext(CategoryContext)
 
     useEffect(() => {
         if (categories.length === 0) {
@@ -15,10 +19,12 @@ const CategoriesOverview: FunctionComponent = () => {
         }
     }, [])
 
+    if (isLoading) return <Loading />
+
     return (
         <Container>
             {categories.map((category) => (
-                <p key={category.id}>{category.displayName}</p>
+                <CategoryOverview key={category.id} category={category} />
             ))}
         </Container>
     )
