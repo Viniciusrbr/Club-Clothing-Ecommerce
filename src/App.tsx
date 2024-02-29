@@ -8,6 +8,7 @@ import HomePage from './pages/home/home.page'
 import LoginPage from './pages/login/login.page'
 import SignUpPage from './pages/sign-up/sign-up.page'
 import ExplorePage from './pages/explore/explore.page'
+import CheckoutPage from './pages/checkout/checkout.page'
 
 // Utilities
 import { auth, db } from './config/firebase.config'
@@ -61,10 +62,11 @@ const App: FunctionComponent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/category/:id" element={<CategoryDetailsPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
       </Routes>
-      
+
       <Cart />
     </BrowserRouter>
   )
