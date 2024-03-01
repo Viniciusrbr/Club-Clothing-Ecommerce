@@ -14,5 +14,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'space-before-function-paren': 0,
+    'multiline-ternary': 0,
   },
 }
