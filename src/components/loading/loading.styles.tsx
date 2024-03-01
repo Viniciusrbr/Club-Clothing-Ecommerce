@@ -14,6 +14,8 @@ export const LoadingContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 100;
+
   p {
     color: ${Colors.text.white};
     font-weight: 500;

@@ -1,6 +1,7 @@
 import {
     createContext,
     FunctionComponent,
+    useEffect,
     useMemo,
     useState
 } from 'react'
@@ -17,6 +18,7 @@ interface ICartContext {
     removeProductFromCart: (productId: string) => void
     increaseProductQuantity: (productId: string) => void
     decreaseProductQuantity: (productId: string) => void
+    clearProducts: () => void
 }
 
 export const CartContext = createContext<ICartContext>({
@@ -28,16 +30,13 @@ export const CartContext = createContext<ICartContext>({
     addProductToCart: () => { },
     removeProductFromCart: () => { },
     increaseProductQuantity: () => { },
-    decreaseProductQuantity: () => { }
+    decreaseProductQuantity: () => { },
+    clearProducts: () => { }
 })
 
 const CartContextProvider: FunctionComponent = ({ children }) => {
     const [isVisible, setIsVisible] = useState(false)
     const [products, setProducts] = useState<CartProduct[]>([])
-
-    /*
-
-    Not working :-(
 
     useEffect(() => {
         const productsFromLocalStorage = JSON.parse(
@@ -50,7 +49,7 @@ const CartContextProvider: FunctionComponent = ({ children }) => {
     useEffect(() => {
         localStorage.setItem('cartProducts', JSON.stringify(products))
     }, [products])
-    */
+
     const productsTotalPrice = useMemo(() => {
         return products.reduce((acc, currentProduct) => {
             return acc + currentProduct.price * currentProduct.quantity
@@ -116,6 +115,10 @@ const CartContextProvider: FunctionComponent = ({ children }) => {
         )
     }
 
+    const clearProducts = () => {
+        setProducts([])
+    }
+
     return (
         <CartContext.Provider
             value={{
@@ -127,7 +130,8 @@ const CartContextProvider: FunctionComponent = ({ children }) => {
                 addProductToCart,
                 removeProductFromCart,
                 increaseProductQuantity,
-                decreaseProductQuantity
+                decreaseProductQuantity,
+                clearProducts
             }}>
             {children}
         </CartContext.Provider>
