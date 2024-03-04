@@ -1,4 +1,4 @@
-import { createContext, FunctionComponent, useState } from "react";
+import { createContext, useState } from "react";
 import User from "../types/user.types";
 
 interface IUserContext {
@@ -15,7 +15,7 @@ export const UserContext = createContext<IUserContext>({
     logoutUser: () => { }
 })
 
-const UserContextProvider: FunctionComponent = ({ children }) => {
+const UserContextProvider = ({ children }) => {
 
     const [currentUser, setCurrentUser] = useState<User | null>(null)
 

@@ -1,6 +1,5 @@
 import {
     createContext,
-    FunctionComponent,
     useEffect,
     useMemo,
     useState
@@ -34,7 +33,7 @@ export const CartContext = createContext<ICartContext>({
     clearProducts: () => { }
 })
 
-const CartContextProvider: FunctionComponent = ({ children }) => {
+const CartContextProvider = ({ children }) => {
     const [isVisible, setIsVisible] = useState(false)
     const [products, setProducts] = useState<CartProduct[]>([])
 

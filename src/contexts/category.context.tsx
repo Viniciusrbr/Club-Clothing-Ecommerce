@@ -1,5 +1,5 @@
 import { collection, getDocs } from 'firebase/firestore'
-import { createContext, FunctionComponent, useState } from 'react'
+import { createContext, useState } from 'react'
 
 // Utilities
 import { db } from '../config/firebase.config'
@@ -18,7 +18,7 @@ export const CategoryContext = createContext<ICategoryContext>({
     fetchCategories: () => Promise.resolve()
 })
 
-const CategoryContextProvider: FunctionComponent = ({ children }) => {
+const CategoryContextProvider = ({ children }) => {
     const [categories, setCategories] = useState<Category[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
