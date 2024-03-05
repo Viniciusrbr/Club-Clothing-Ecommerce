@@ -24,7 +24,7 @@ const Checkout: FunctionComponent = () => {
             setIsLoading(true)
 
             const { data } = await axios.post(
-                `${import.meta.env.VITE_API_URL}/create-checkout-session`,
+                "/.netlify/functions/create-checkout-session",
                 {
                     products
                 }
