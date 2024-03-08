@@ -1,30 +1,23 @@
-# React + TypeScript + Vite
+# Club Clothing
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O Club Clothing é um e-commerce de roupas. O usuário pode se cadastrar e fazer login com o Google ou email e senha, navegar pelo catálogo de produtos, adicionar e remover produtos ao carrinho, e realizar pagamentos com o Stripe.
 
-Currently, two official plugins are available:
+<h3>🤔 Como testar o método de pagamento ?</h3>
+<ul>
+    <li>Ao clicar em "Finalizar Compra" na página de checkout você será redirecionado para a página de pagamentos do stripe.</li>
+    <li>Em dados do cartão, você pode usar o número: 4242 4242 4242 4242.</li>
+    <li>A data de vencimento pode ser qualquer uma que esteja no futuro. As demais informações podem ser aleatórias.</li>
+</ul>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+<h3>🛠️ Tecnologias Utilizadas</h3>
+<ul>
+    <li>React com TypeScript</li>
+    <li>React Router</li>
+    <li>React Hook Form</li>
+    <li>Context API</li>
+    <li>Styled Components</li>
+    <li>Firebase</li>
+    <li>Stipe API</li>
+</ul>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
