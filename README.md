@@ -18,6 +18,6 @@ O Club Clothing é um e-commerce de roupas. O usuário pode se cadastrar e fazer
     <li>Context API</li>
     <li>Styled Components</li>
     <li>Firebase</li>
-    <li>Stipe API</li>
+    <li>Stripe API</li>
 </ul>
 
