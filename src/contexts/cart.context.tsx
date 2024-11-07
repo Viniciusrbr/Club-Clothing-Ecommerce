@@ -1,6 +1,6 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
-import CartProduct from '../types/cart.types';
-import Product from '../types/product.types';
+import { createContext, useEffect, useMemo, useState } from "react";
+import CartProduct from "../types/cart.types";
+import Product from "../types/product.types";
 
 interface ICartContext {
   isVisible: boolean;
@@ -33,21 +33,54 @@ const CartContextProvider = ({ children }) => {
   const [products, setProducts] = useState<CartProduct[]>([]);
 
   useEffect(() => {
-    const productsFromLocalStorage = JSON.parse(localStorage.getItem('cartProducts')!);
+    try {
+      const productsFromLocalStorage = localStorage.getItem("cartProducts");
 
-    if (productsFromLocalStorage) {
-      setProducts(JSON.parse(productsFromLocalStorage));
+      // Verifica se existe algo no localStorage e se é uma string válida
+      if (
+        productsFromLocalStorage &&
+        productsFromLocalStorage !== "undefined" &&
+        productsFromLocalStorage !== "null"
+      ) {
+        try {
+          const parsedProducts = JSON.parse(productsFromLocalStorage);
+          // Verifica se o que foi parseado é um array
+          if (Array.isArray(parsedProducts)) {
+            setProducts(parsedProducts);
+          } else {
+            setProducts([]);
+            localStorage.removeItem("cartProducts"); // Remove dados inválidos
+          }
+        } catch (parseError) {
+          console.error("Error parsing cart products:", parseError);
+          setProducts([]);
+          localStorage.removeItem("cartProducts"); // Remove dados inválidos
+        }
+      } else {
+        setProducts([]);
+        localStorage.removeItem("cartProducts"); // Remove dados inválidos
+      }
+    } catch (error) {
+      console.error("Error loading cart products:", error);
+      setProducts([]);
     }
   }, []);
 
   useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem('cartProducts', JSON.stringify(products));
+    try {
+      if (products && Array.isArray(products)) {
+        if (products.length > 0) {
+          localStorage.setItem("cartProducts", JSON.stringify(products));
+        } else {
+          localStorage.removeItem("cartProducts");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving cart products:", error);
     }
   }, [products]);
 
   const productsTotalPrice = useMemo(() => {
-
     if (!products || products.length === 0) return 0;
 
     return products.reduce((acc, currentProduct) => {
@@ -56,7 +89,6 @@ const CartContextProvider = ({ children }) => {
   }, [products]);
 
   const productsCount = useMemo(() => {
-
     if (!products || products.length === 0) return 0;
 
     return products.reduce((acc, currentProduct) => {
@@ -70,12 +102,18 @@ const CartContextProvider = ({ children }) => {
 
   const addProductToCart = (product: Product) => {
     // verificar se o produto já está no carrinho
-    const productIsAlreadyInCart = products.some((item) => item.id === product.id);
+    const productIsAlreadyInCart = products.some(
+      (item) => item.id === product.id
+    );
 
     // se sim -> aumentar sua quantidade
     if (productIsAlreadyInCart) {
       return setProducts((products) =>
-        products.map((item) => (item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item))
+        products.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
       );
     }
 
@@ -84,19 +122,29 @@ const CartContextProvider = ({ children }) => {
   };
 
   const removeProductFromCart = (productId: string) => {
-    setProducts((products) => products.filter((product) => product.id !== productId));
+    setProducts((products) =>
+      products.filter((product) => product.id !== productId)
+    );
   };
 
   const increaseProductQuantity = (productId: string) => {
     setProducts((products) =>
-      products.map((product) => (product.id === productId ? { ...product, quantity: product.quantity + 1 } : product))
+      products.map((product) =>
+        product.id === productId
+          ? { ...product, quantity: product.quantity + 1 }
+          : product
+      )
     );
   };
 
   const decreaseProductQuantity = (productId: string) => {
     setProducts((products) =>
       products
-        .map((product) => (product.id === productId ? { ...product, quantity: product.quantity - 1 } : product))
+        .map((product) =>
+          product.id === productId
+            ? { ...product, quantity: product.quantity - 1 }
+            : product
+        )
         .filter((product) => product.quantity > 0)
     );
   };
