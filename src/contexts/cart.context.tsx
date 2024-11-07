@@ -35,20 +35,30 @@ const CartContextProvider = ({ children }) => {
   useEffect(() => {
     const productsFromLocalStorage = JSON.parse(localStorage.getItem('cartProducts')!);
 
-    setProducts(productsFromLocalStorage);
+    if (productsFromLocalStorage) {
+      setProducts(JSON.parse(productsFromLocalStorage));
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('cartProducts', JSON.stringify(products));
+    if (products.length > 0) {
+      localStorage.setItem('cartProducts', JSON.stringify(products));
+    }
   }, [products]);
 
   const productsTotalPrice = useMemo(() => {
+
+    if (!products || products.length === 0) return 0;
+
     return products.reduce((acc, currentProduct) => {
       return acc + currentProduct.price * currentProduct.quantity;
     }, 0);
   }, [products]);
 
   const productsCount = useMemo(() => {
+
+    if (!products || products.length === 0) return 0;
+
     return products.reduce((acc, currentProduct) => {
       return acc + currentProduct.quantity;
     }, 0);
