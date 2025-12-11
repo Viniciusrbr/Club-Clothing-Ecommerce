@@ -50,9 +50,17 @@ Instale as dependências:
 npm install
 ```
 
-Execute a aplicação:
-```bash
-npm run dev
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+```env
+STRIPE_SECRET_API_KEY=sua_chave_secreta_stripe
+FRONT_END_URL=http://localhost:8888
 ```
 
-Pronto, agora é possível acessar a aplicação a partir da rota http://localhost:5173/
+Execute a aplicação com suporte às funções do Netlify:
+```bash
+npm run dev:netlify
+```
+
+Pronto, agora é possível acessar a aplicação a partir da rota http://localhost:8888/
+
+> 💡 **Dica:** Se você não precisar testar os pagamentos com Stripe, pode usar `npm run dev` e acessar http://localhost:5173/
