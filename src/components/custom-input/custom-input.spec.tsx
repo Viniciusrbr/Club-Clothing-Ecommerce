@@ -23,7 +23,7 @@ describe('Custom Input', () => {
 
         const input = getByPlaceholderText('Lorem Ipsum')
 
-        expect(input).toHaveStyle({ border: 'none' })
+        expect(input).toHaveStyle({ borderStyle: 'none' })
     })
 
     it('should change value when user types', async () => {
