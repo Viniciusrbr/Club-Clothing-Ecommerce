@@ -20,60 +20,45 @@ export const CartContext = createContext<ICartContext>({
   productsTotalPrice: 0,
   productsCount: 0,
   products: [],
-  toggleCart: () => {},
-  addProductToCart: () => {},
-  removeProductFromCart: () => {},
-  increaseProductQuantity: () => {},
-  decreaseProductQuantity: () => {},
-  clearProducts: () => {},
+  toggleCart: () => { },
+  addProductToCart: () => { },
+  removeProductFromCart: () => { },
+  increaseProductQuantity: () => { },
+  decreaseProductQuantity: () => { },
+  clearProducts: () => { },
 });
+
+const CART_STORAGE_KEY = "cartProducts";
+
+const getStoredCartProducts = (): CartProduct[] => {
+  try {
+    const productsFromLocalStorage = localStorage.getItem(CART_STORAGE_KEY);
+
+    if (!productsFromLocalStorage) return [];
+
+    const parsedProducts = JSON.parse(productsFromLocalStorage);
+    if (Array.isArray(parsedProducts)) return parsedProducts;
+
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } catch (error) {
+    console.error("Error loading cart products:", error);
+  }
+
+  return [];
+};
 
 const CartContextProvider = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [products, setProducts] = useState<CartProduct[]>([]);
+  const [products, setProducts] = useState<CartProduct[]>(
+    getStoredCartProducts
+  );
 
   useEffect(() => {
     try {
-      const productsFromLocalStorage = localStorage.getItem("cartProducts");
-
-      // Verifica se existe algo no localStorage e se é uma string válida
-      if (
-        productsFromLocalStorage &&
-        productsFromLocalStorage !== "undefined" &&
-        productsFromLocalStorage !== "null"
-      ) {
-        try {
-          const parsedProducts = JSON.parse(productsFromLocalStorage);
-          // Verifica se o que foi parseado é um array
-          if (Array.isArray(parsedProducts)) {
-            setProducts(parsedProducts);
-          } else {
-            setProducts([]);
-            localStorage.removeItem("cartProducts"); // Remove dados inválidos
-          }
-        } catch (parseError) {
-          console.error("Error parsing cart products:", parseError);
-          setProducts([]);
-          localStorage.removeItem("cartProducts"); // Remove dados inválidos
-        }
+      if (products.length > 0) {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(products));
       } else {
-        setProducts([]);
-        localStorage.removeItem("cartProducts"); // Remove dados inválidos
-      }
-    } catch (error) {
-      console.error("Error loading cart products:", error);
-      setProducts([]);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      if (products && Array.isArray(products)) {
-        if (products.length > 0) {
-          localStorage.setItem("cartProducts", JSON.stringify(products));
-        } else {
-          localStorage.removeItem("cartProducts");
-        }
+        localStorage.removeItem(CART_STORAGE_KEY);
       }
     } catch (error) {
       console.error("Error saving cart products:", error);

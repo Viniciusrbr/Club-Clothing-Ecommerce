@@ -1,6 +1,6 @@
 import { PiUserPlus } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
-import validator from 'validator'
+import isEmail from 'validator/es/lib/isEmail'
 import { Link, useNavigate } from 'react-router'
 import { useContext, useEffect, useState } from 'react'
 
@@ -139,7 +139,7 @@ const SignUpPage = () => {
                                 {...register('email', {
                                     required: true,
                                     validate: (value) => {
-                                        return validator.isEmail(value)
+                                        return isEmail(value)
                                     }
                                 })}
                             />

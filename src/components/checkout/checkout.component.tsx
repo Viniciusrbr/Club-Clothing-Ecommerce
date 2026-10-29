@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { FunctionComponent, useContext, useState } from 'react';
 import { PiLockSimple, PiShoppingBagOpen, PiWarningCircle } from 'react-icons/pi';
 import { useNavigate } from 'react-router';
@@ -36,9 +35,17 @@ const Checkout: FunctionComponent = () => {
       setIsLoading(true);
       setHasError(false);
 
-      const { data } = await axios.post('/.netlify/functions/create-checkout-session', {
-        products,
+      const response = await fetch('/.netlify/functions/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Checkout session request failed: ${response.status}`);
+      }
+
+      const data: { url: string } = await response.json();
 
       window.location.href = data.url;
     } catch (error) {

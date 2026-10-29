@@ -1,6 +1,6 @@
 import { PiGoogleLogo, PiSignIn } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
-import validator from 'validator'
+import isEmail from 'validator/es/lib/isEmail'
 import { useEffect, useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
@@ -150,7 +150,7 @@ const LoginPage = () => {
                                 {...register('email', {
                                     required: true,
                                     validate: (value) => {
-                                        return validator.isEmail(value)
+                                        return isEmail(value)
                                     }
                                 })}
                             />
