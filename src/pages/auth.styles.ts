@@ -48,6 +48,23 @@ export const AuthDivider = styled.p`
   }
 `
 
+export const AuthFormError = styled.p`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 12px 14px;
+  border-radius: ${Tokens.radius.sm};
+  background-color: rgba(179, 38, 30, 0.08);
+  color: ${Colors.error};
+  font-size: 0.875rem;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+`
+
 export const AuthForm = styled.form`
   display: flex;
   flex-direction: column;

@@ -1,8 +1,8 @@
-import { PiGoogleLogo, PiSignIn } from 'react-icons/pi'
+import { PiGoogleLogo, PiSignIn, PiWarningCircle } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/es/lib/isEmail'
 import { useEffect, useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 // Components
 import CustomButton from '../../components/custom-button/custom-button.component'
@@ -18,6 +18,7 @@ import {
     AuthField,
     AuthFooter,
     AuthForm,
+    AuthFormError,
     AuthHeadline,
     AuthLabel,
     AuthSubtitle
@@ -27,7 +28,6 @@ import {
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
 
 import {
-    AuthError,
     AuthErrorCodes,
     signInWithEmailAndPassword,
     signInWithPopup
@@ -35,7 +35,14 @@ import {
 
 import { auth, db, googleProvider } from '../../config/firebase.config'
 import { UserContext } from '../../contexts/user.context'
+import getAuthErrorMessage, { getAuthErrorCode } from '../../helpers/auth-error-message'
 import User from '../../types/user.types'
+
+const INVALID_CREDENTIALS_CODES: string[] = [
+    AuthErrorCodes.INVALID_LOGIN_CREDENTIALS,
+    AuthErrorCodes.INVALID_PASSWORD,
+    AuthErrorCodes.USER_DELETED
+]
 
 interface LoginForm {
     email: string
@@ -51,35 +58,35 @@ const LoginPage = () => {
     } = useForm<LoginForm>()
 
     const [isLoading, setIsLoading] = useState(false)
+    const [formError, setFormError] = useState<string | null>(null)
 
     const { isAuthenticated, loginUser } = useContext(UserContext)
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const redirectTo = (location.state as { from?: string } | null)?.from ?? '/'
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/')
+            navigate(redirectTo, { replace: true })
         }
-    }, [isAuthenticated, navigate])
+    }, [isAuthenticated, navigate, redirectTo])
 
     const handleSubmitPress = async (data: LoginForm) => {
         try {
             setIsLoading(true)
+            setFormError(null)
             await signInWithEmailAndPassword(auth, data.email, data.password)
         } catch (error) {
-            const _error = error as AuthError
-
-            if (_error.code === AuthErrorCodes.INVALID_PASSWORD) {
-                return setError('password', { type: 'mismatch' })
-            }
-
-            if (_error.code === AuthErrorCodes.USER_DELETED) {
-                return setError('email', { type: 'notFound' })
-            }
-            if (_error.code === AuthErrorCodes.INVALID_LOGIN_CREDENTIALS) {
+            if (INVALID_CREDENTIALS_CODES.includes(getAuthErrorCode(error) ?? '')) {
                 setError('email', { type: 'invalid' })
                 setError('password', { type: 'invalid' })
+                return
             }
+
+            console.error(error)
+            setFormError(getAuthErrorMessage(error))
         } finally {
             setIsLoading(false)
         }
@@ -88,6 +95,7 @@ const LoginPage = () => {
     const handleSignInWithGooglePress = async () => {
         try {
             setIsLoading(true)
+            setFormError(null)
             const userCredentials = await signInWithPopup(auth, googleProvider)
 
             const querySnapshot = await getDocs(
@@ -117,6 +125,7 @@ const LoginPage = () => {
             }
         } catch (error) {
             console.error(error)
+            setFormError(getAuthErrorMessage(error))
         } finally {
             setIsLoading(false)
         }
@@ -130,6 +139,13 @@ const LoginPage = () => {
                 <AuthContent>
                     <AuthHeadline>Entre com a sua conta</AuthHeadline>
                     <AuthSubtitle>Acesse seu carrinho e finalize suas compras.</AuthSubtitle>
+
+                    {formError && (
+                        <AuthFormError role="alert">
+                            <PiWarningCircle aria-hidden="true" />
+                            {formError}
+                        </AuthFormError>
+                    )}
 
                     <CustomButton
                         variant="secondary"
@@ -161,12 +177,6 @@ const LoginPage = () => {
                                 <InputErrorMessage>O e-mail é obrigatório.</InputErrorMessage>
                             )}
 
-                            {errors?.email?.type === 'notFound' && (
-                                <InputErrorMessage>
-                                    O e-mail não foi encontrado.
-                                </InputErrorMessage>
-                            )}
-
                             {errors?.email?.type === 'invalid' && (
                                 <InputErrorMessage>
                                     Usuário e/ou senha inválidos.
@@ -195,10 +205,6 @@ const LoginPage = () => {
                                 <InputErrorMessage>A senha é obrigatória.</InputErrorMessage>
                             )}
 
-                            {errors?.password?.type === 'mismatch' && (
-                                <InputErrorMessage>A senha é inválida.</InputErrorMessage>
-                            )}
-
                             {errors?.password?.type === 'invalid' && (
                                 <InputErrorMessage>
                                     Usuário e/ou senha inválidos.
@@ -212,7 +218,10 @@ const LoginPage = () => {
                     </AuthForm>
 
                     <AuthFooter>
-                        Ainda não tem uma conta? <Link to="/sign-up">Criar conta</Link>
+                        Ainda não tem uma conta?{' '}
+                        <Link to="/sign-up" state={location.state}>
+                            Criar conta
+                        </Link>
                     </AuthFooter>
                 </AuthContent>
             </AuthContainer>

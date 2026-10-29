@@ -1,5 +1,5 @@
 import { ReactNode, useContext, useEffect } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 
 // Utilities
 import { UserContext } from '../contexts/user.context'
@@ -11,16 +11,20 @@ function AuthenticationGuard({ children }: { children: ReactNode }) {
     const { isAuthenticated } = useContext(UserContext)
 
     const navigate = useNavigate()
+    const { pathname, search } = useLocation()
 
     useEffect(() => {
         if (isAuthenticated) return
 
         const timeout = setTimeout(() => {
-            navigate('/login')
+            navigate('/login', {
+                replace: true,
+                state: { from: `${pathname}${search}` }
+            })
         }, 3000)
 
         return () => clearTimeout(timeout)
-    }, [isAuthenticated, navigate])
+    }, [isAuthenticated, navigate, pathname, search])
 
     if (!isAuthenticated) {
         return (

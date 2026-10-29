@@ -1,7 +1,7 @@
-import { PiUserPlus } from 'react-icons/pi'
+import { PiUserPlus, PiWarningCircle } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
 import isEmail from 'validator/es/lib/isEmail'
-import { Link, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { useContext, useEffect, useState } from 'react'
 
 // Components
@@ -18,17 +18,19 @@ import {
     AuthFieldRow,
     AuthFooter,
     AuthForm,
+    AuthFormError,
     AuthHeadline,
     AuthLabel,
     AuthSubtitle
 } from '../auth.styles'
 
 // Firebase
-import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
+import { AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth, db } from '../../config/firebase.config'
 import { addDoc, collection } from 'firebase/firestore'
 
 import { UserContext } from '../../contexts/user.context'
+import getAuthErrorMessage, { getAuthErrorCode } from '../../helpers/auth-error-message'
 import User from '../../types/user.types'
 
 interface SignUpForm {
@@ -48,20 +50,25 @@ const SignUpPage = () => {
     } = useForm<SignUpForm>()
 
     const [isLoading, setIsLoading] = useState(false)
+    const [formError, setFormError] = useState<string | null>(null)
 
     const { isAuthenticated, loginUser } = useContext(UserContext)
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const redirectTo = (location.state as { from?: string } | null)?.from ?? '/'
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/')
+            navigate(redirectTo, { replace: true })
         }
-    }, [isAuthenticated, navigate])
+    }, [isAuthenticated, navigate, redirectTo])
 
     const handleSubmitPress = async (data: SignUpForm) => {
         try {
             setIsLoading(true)
+            setFormError(null)
             const userCredentials = await createUserWithEmailAndPassword(auth, data.email, data.password)
 
             const newUser: User = {
@@ -76,11 +83,22 @@ const SignUpPage = () => {
 
             loginUser(newUser)
         } catch (error) {
-            const _error = error as AuthError
+            const code = getAuthErrorCode(error)
 
-            if (_error.code === AuthErrorCodes.EMAIL_EXISTS) {
+            if (code === AuthErrorCodes.EMAIL_EXISTS) {
                 return setError('email', { type: 'alreadyInUse' })
             }
+
+            if (code === AuthErrorCodes.INVALID_EMAIL) {
+                return setError('email', { type: 'validate' })
+            }
+
+            if (code === AuthErrorCodes.WEAK_PASSWORD) {
+                return setError('password', { type: 'weak' })
+            }
+
+            console.error(error)
+            setFormError(getAuthErrorMessage(error))
         } finally {
             setIsLoading(false)
         }
@@ -94,6 +112,13 @@ const SignUpPage = () => {
                 <AuthContent>
                     <AuthHeadline>Crie sua conta</AuthHeadline>
                     <AuthSubtitle>Leva menos de um minuto.</AuthSubtitle>
+
+                    {formError && (
+                        <AuthFormError role="alert">
+                            <PiWarningCircle aria-hidden="true" />
+                            {formError}
+                        </AuthFormError>
+                    )}
 
                     <AuthForm noValidate onSubmit={handleSubmit(handleSubmitPress)}>
                         <AuthFieldRow>
@@ -179,6 +204,12 @@ const SignUpPage = () => {
                                     A senha precisa ter no mínimo 6 caracteres.
                                 </InputErrorMessage>
                             )}
+
+                            {errors?.password?.type === 'weak' && (
+                                <InputErrorMessage>
+                                    Essa senha é muito fraca. Escolha uma senha mais forte.
+                                </InputErrorMessage>
+                            )}
                         </AuthField>
 
                         <AuthField>
@@ -225,7 +256,10 @@ const SignUpPage = () => {
                     </AuthForm>
 
                     <AuthFooter>
-                        Já tem uma conta? <Link to="/login">Entrar</Link>
+                        Já tem uma conta?{' '}
+                        <Link to="/login" state={location.state}>
+                            Entrar
+                        </Link>
                     </AuthFooter>
                 </AuthContent>
             </AuthContainer>
