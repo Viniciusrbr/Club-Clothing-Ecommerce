@@ -3,7 +3,7 @@ import { FiLogIn } from 'react-icons/fi'
 import { useForm } from 'react-hook-form'
 import validator from 'validator'
 import { useEffect, useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 // Components
 import CustomButton from '../../components/custom-button/custom-button.component'

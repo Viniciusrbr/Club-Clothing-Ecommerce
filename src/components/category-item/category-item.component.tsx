@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 // Utilities
 import Category from '../../types/category.types'
 

@@ -1,6 +1,6 @@
 import { FunctionComponent, useContext } from 'react'
 import { BsCartCheck } from 'react-icons/bs'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 // Utilities
 import { CartContext } from '../../contexts/cart.context'

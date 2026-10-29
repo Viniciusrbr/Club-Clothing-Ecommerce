@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 
 import CategoryDetails from '../../components/category-details/category-details.component'
 
