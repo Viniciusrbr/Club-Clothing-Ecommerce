@@ -1,5 +1,8 @@
-require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_SECRET_API_KEY);
+const Stripe = require('stripe');
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY, {
+  apiVersion: '2026-09-30.endive',
+});
 
 exports.handler = async (event) => {
   try {
