@@ -30,8 +30,10 @@ import { auth, db } from '../../config/firebase.config'
 import { addDoc, collection } from 'firebase/firestore'
 
 import { UserContext } from '../../contexts/user.context'
+import User from '../../types/user.types'
+
 interface SignUpForm {
-    fistName: string
+    firstName: string
     lastName: string
     email: string
     password: string
@@ -42,16 +44,13 @@ const SignUpPage = () => {
     const {
         register,
         handleSubmit,
-        watch,
         setError,
         formState: { errors }
     } = useForm<SignUpForm>()
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const watchPassword = watch('password')
-
-    const { isAuthenticated } = useContext(UserContext)
+    const { isAuthenticated, loginUser } = useContext(UserContext)
 
     const navigate = useNavigate()
 
@@ -59,20 +58,24 @@ const SignUpPage = () => {
         if (isAuthenticated) {
             navigate('/')
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, navigate])
 
     const handleSubmitPress = async (data: SignUpForm) => {
         try {
             setIsLoading(true)
             const userCredentials = await createUserWithEmailAndPassword(auth, data.email, data.password)
 
-            await addDoc(collection(db, 'users'), {
+            const newUser: User = {
                 id: userCredentials.user.uid,
-                email: userCredentials.user.email,
-                firstName: data.fistName,
+                email: userCredentials.user.email ?? data.email,
+                firstName: data.firstName,
                 lastName: data.lastName,
                 provider: 'firebase'
-            })
+            }
+
+            await addDoc(collection(db, 'users'), newUser)
+
+            loginUser(newUser)
         } catch (error) {
             const _error = error as AuthError
 
@@ -102,12 +105,12 @@ const SignUpPage = () => {
                                 <CustomInput
                                     id="sign-up-first-name"
                                     autoComplete="given-name"
-                                    hasError={!!errors?.fistName}
+                                    hasError={!!errors?.firstName}
                                     placeholder="Seu nome"
-                                    {...register('fistName', { required: true })}
+                                    {...register('firstName', { required: true })}
                                 />
 
-                                {errors?.fistName?.type === 'required' && (
+                                {errors?.firstName?.type === 'required' && (
                                     <InputErrorMessage>O nome é obrigatório.</InputErrorMessage>
                                 )}
                             </AuthField>
@@ -194,8 +197,8 @@ const SignUpPage = () => {
                                 {...register('passwordConfirmation', {
                                     required: true,
                                     minLength: 6,
-                                    validate: (value) => {
-                                        return value === watchPassword
+                                    validate: (value, formValues) => {
+                                        return value === formValues.password
                                     }
                                 })}
                             />

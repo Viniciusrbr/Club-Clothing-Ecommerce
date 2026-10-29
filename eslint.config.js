@@ -34,13 +34,7 @@ export default defineConfig([
       '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/no-empty-function': 'off',
 
-      // Regras que o código existente viola. Corrigi-las exigiria mudar
-      // comportamento (ex.: adicionar deps em useEffect causa refetch em loop
-      // em CategoriesOverview) ou reestruturar arquivos, fora do escopo da
-      // atualização de dependências.
-      'react-hooks/exhaustive-deps': 'off',
-      'react-hooks/set-state-in-effect': 'off',
-      'react-hooks/incompatible-library': 'off',
+      // Os arquivos de contexto exportam o contexto e o provider juntos
       'react-refresh/only-export-components': 'off',
     },
   },

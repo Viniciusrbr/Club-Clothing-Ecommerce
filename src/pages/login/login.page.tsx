@@ -36,6 +36,7 @@ import {
 
 import { auth, db, googleProvider } from '../../config/firebase.config'
 import { UserContext } from '../../contexts/user.context'
+import User from '../../types/user.types'
 
 interface LoginForm {
     email: string
@@ -52,7 +53,7 @@ const LoginPage = () => {
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const { isAuthenticated } = useContext(UserContext)
+    const { isAuthenticated, loginUser } = useContext(UserContext)
 
     const navigate = useNavigate()
 
@@ -60,7 +61,7 @@ const LoginPage = () => {
         if (isAuthenticated) {
             navigate('/')
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, navigate])
 
     const handleSubmitPress = async (data: LoginForm) => {
         try {
@@ -100,19 +101,23 @@ const LoginPage = () => {
             const user = querySnapshot.docs[0]?.data()
 
             if (!user) {
-                const firstName = userCredentials.user.displayName?.split(' ')[0]
-                const lastName = userCredentials.user.displayName?.split(' ')[1]
+                const [firstName = '', ...lastNameParts] =
+                    userCredentials.user.displayName?.split(' ') ?? []
 
-                await addDoc(collection(db, 'users'), {
+                const newUser: User = {
                     id: userCredentials.user.uid,
-                    email: userCredentials.user.email,
+                    email: userCredentials.user.email ?? '',
                     firstName,
-                    lastName,
+                    lastName: lastNameParts.join(' '),
                     provider: 'google'
-                })
+                }
+
+                await addDoc(collection(db, 'users'), newUser)
+
+                loginUser(newUser)
             }
         } catch (error) {
-            console.log(error)
+            console.error(error)
         } finally {
             setIsLoading(false)
         }

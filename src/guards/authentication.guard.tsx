@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { ReactNode, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 
 // Utilities
@@ -8,18 +8,20 @@ import { UserContext } from '../contexts/user.context'
 import Header from '../components/header/header.component'
 import Loading from '../components/loading/loading.component'
 
-function AuthenticationGuard({ children }) {
+function AuthenticationGuard({ children }: { children: ReactNode }) {
     const { isAuthenticated } = useContext(UserContext)
 
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            setTimeout(() => {
-                navigate('/login')
-            }, 3000)
-        }
-    }, [isAuthenticated])
+        if (isAuthenticated) return
+
+        const timeout = setTimeout(() => {
+            navigate('/login')
+        }, 3000)
+
+        return () => clearTimeout(timeout)
+    }, [isAuthenticated, navigate])
 
     if (!isAuthenticated) {
         return (
