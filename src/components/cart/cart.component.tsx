@@ -3,7 +3,7 @@ import { PiArrowRight, PiLockSimple, PiShoppingBagOpen, PiX } from 'react-icons/
 import { useNavigate } from 'react-router'
 
 // Utilities
-import { CartContext } from '../../contexts/cart.context'
+import { CartActionsContext, CartContext } from '../../contexts/cart.context'
 import formatPrice from '../../helpers/format-price'
 
 // Components
@@ -26,8 +26,9 @@ import {
 } from './cart.styles'
 
 const Cart: FunctionComponent = () => {
-    const { isVisible, products, productsTotalPrice, productsCount, toggleCart } =
+    const { isVisible, products, productsTotalPrice, productsCount } =
         useContext(CartContext)
+    const { toggleCart } = useContext(CartActionsContext)
 
     const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -49,7 +50,7 @@ const Cart: FunctionComponent = () => {
             document.body.style.overflow = ''
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [isVisible])
+    }, [isVisible, toggleCart])
 
     const handleGoToCheckoutClick = () => {
         navigate('/checkout')

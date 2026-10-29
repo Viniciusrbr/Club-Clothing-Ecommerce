@@ -1,5 +1,12 @@
 import { collection, getDocs } from 'firebase/firestore'
-import { createContext, useState } from 'react'
+import {
+    createContext,
+    ReactNode,
+    useCallback,
+    useMemo,
+    useRef,
+    useState
+} from 'react'
 
 // Utilities
 import { db } from '../config/firebase.config'
@@ -20,39 +27,48 @@ export const CategoryContext = createContext<ICategoryContext>({
     fetchCategories: () => Promise.resolve()
 })
 
-const CategoryContextProvider = ({ children }) => {
+const CategoryContextProvider = ({ children }: { children: ReactNode }) => {
     const [categories, setCategories] = useState<Category[]>([])
     // Começa como true para exibir o skeleton até a primeira busca terminar
     const [isLoading, setIsLoading] = useState(true)
     const [hasError, setHasError] = useState(false)
 
-    const fetchCategories = async () => {
-        try {
-            setIsLoading(true)
-            setHasError(false)
+    const pendingRequestRef = useRef<Promise<void> | null>(null)
 
-            const categoriesFromFirestore: Category[] = []
+    const fetchCategories = useCallback(() => {
+        if (pendingRequestRef.current) return pendingRequestRef.current
 
-            const querySnapshot = await getDocs(
-                collection(db, 'categories').withConverter(categoryConverter)
-            )
+        const request = (async () => {
+            try {
+                setIsLoading(true)
+                setHasError(false)
 
-            querySnapshot.forEach((doc) => {
-                categoriesFromFirestore.push(doc.data())
-            })
+                const querySnapshot = await getDocs(
+                    collection(db, 'categories').withConverter(categoryConverter)
+                )
 
-            setCategories(categoriesFromFirestore)
-        } catch (error) {
-            console.log({ error })
-            setHasError(true)
-        } finally {
-            setIsLoading(false)
-        }
-    }
+                setCategories(querySnapshot.docs.map((doc) => doc.data()))
+            } catch (error) {
+                console.error(error)
+                setHasError(true)
+            } finally {
+                setIsLoading(false)
+                pendingRequestRef.current = null
+            }
+        })()
+
+        pendingRequestRef.current = request
+
+        return request
+    }, [])
+
+    const value = useMemo(
+        () => ({ categories, isLoading, hasError, fetchCategories }),
+        [categories, isLoading, hasError, fetchCategories]
+    )
 
     return (
-        <CategoryContext.Provider
-            value={{ categories, isLoading, hasError, fetchCategories }}>
+        <CategoryContext.Provider value={value}>
             {children}
         </CategoryContext.Provider>
     )

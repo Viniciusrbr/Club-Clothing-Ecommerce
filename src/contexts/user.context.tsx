@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, ReactNode, useCallback, useMemo, useState } from "react";
 import User from "../types/user.types";
 
 interface IUserContext {
@@ -15,22 +15,30 @@ export const UserContext = createContext<IUserContext>({
     logoutUser: () => { }
 })
 
-const UserContextProvider = ({ children }) => {
+const UserContextProvider = ({ children }: { children: ReactNode }) => {
 
     const [currentUser, setCurrentUser] = useState<User | null>(null)
 
-    const isAuthenticated = currentUser !== null
-
-    const loginUser = (user: User) => {
+    const loginUser = useCallback((user: User) => {
         setCurrentUser(user)
-    }
+    }, [])
 
-    const logoutUser = () => {
+    const logoutUser = useCallback(() => {
         setCurrentUser(null)
-    }
+    }, [])
+
+    const value = useMemo(
+        () => ({
+            currentUser,
+            isAuthenticated: currentUser !== null,
+            loginUser,
+            logoutUser
+        }),
+        [currentUser, loginUser, logoutUser]
+    )
 
     return (
-        <UserContext.Provider value={{ currentUser, isAuthenticated, loginUser, logoutUser }}>
+        <UserContext.Provider value={value}>
             {children}
         </UserContext.Provider>
     )

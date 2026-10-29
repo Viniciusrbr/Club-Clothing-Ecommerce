@@ -1,6 +1,6 @@
 import { FunctionComponent, useContext } from 'react'
 import { PiMinus, PiPlus, PiTrash } from 'react-icons/pi'
-import { CartContext } from '../../contexts/cart.context'
+import { CartActionsContext } from '../../contexts/cart.context'
 
 // Utilities
 import CartProduct from '../../types/cart.types'
@@ -30,7 +30,7 @@ const CartItem: FunctionComponent<CartItemProps> = ({ product }) => {
         removeProductFromCart,
         increaseProductQuantity,
         decreaseProductQuantity
-    } = useContext(CartContext)
+    } = useContext(CartActionsContext)
 
     const handleRemoveClick = () => {
         removeProductFromCart(product.id)

@@ -1,13 +1,12 @@
-import { PiUserPlus } from 'react-icons/pi'
+import { PiUserPlus, PiWarningCircle } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
-import validator from 'validator'
-import { Link, useNavigate } from 'react-router'
+import isEmail from 'validator/es/lib/isEmail'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { useContext, useEffect, useState } from 'react'
 
 // Components
 import CustomButton from '../../components/custom-button/custom-button.component'
 import CustomInput from '../../components/custom-input/custom-input.component'
-import Header from '../../components/header/header.component'
 import InputErrorMessage from '../../components/input-error-message/input-error-message.component'
 import Loading from '../../components/loading/loading.component'
 
@@ -19,19 +18,23 @@ import {
     AuthFieldRow,
     AuthFooter,
     AuthForm,
+    AuthFormError,
     AuthHeadline,
     AuthLabel,
     AuthSubtitle
 } from '../auth.styles'
 
 // Firebase
-import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
+import { AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
 import { auth, db } from '../../config/firebase.config'
 import { addDoc, collection } from 'firebase/firestore'
 
 import { UserContext } from '../../contexts/user.context'
+import getAuthErrorMessage, { getAuthErrorCode } from '../../helpers/auth-error-message'
+import User from '../../types/user.types'
+
 interface SignUpForm {
-    fistName: string
+    firstName: string
     lastName: string
     email: string
     password: string
@@ -42,43 +45,60 @@ const SignUpPage = () => {
     const {
         register,
         handleSubmit,
-        watch,
         setError,
         formState: { errors }
     } = useForm<SignUpForm>()
 
     const [isLoading, setIsLoading] = useState(false)
+    const [formError, setFormError] = useState<string | null>(null)
 
-    const watchPassword = watch('password')
-
-    const { isAuthenticated } = useContext(UserContext)
+    const { isAuthenticated, loginUser } = useContext(UserContext)
 
     const navigate = useNavigate()
+    const location = useLocation()
+
+    const redirectTo = (location.state as { from?: string } | null)?.from ?? '/'
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/')
+            navigate(redirectTo, { replace: true })
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, navigate, redirectTo])
 
     const handleSubmitPress = async (data: SignUpForm) => {
         try {
             setIsLoading(true)
+            setFormError(null)
             const userCredentials = await createUserWithEmailAndPassword(auth, data.email, data.password)
 
-            await addDoc(collection(db, 'users'), {
+            const newUser: User = {
                 id: userCredentials.user.uid,
-                email: userCredentials.user.email,
-                firstName: data.fistName,
+                email: userCredentials.user.email ?? data.email,
+                firstName: data.firstName,
                 lastName: data.lastName,
                 provider: 'firebase'
-            })
-        } catch (error) {
-            const _error = error as AuthError
+            }
 
-            if (_error.code === AuthErrorCodes.EMAIL_EXISTS) {
+            await addDoc(collection(db, 'users'), newUser)
+
+            loginUser(newUser)
+        } catch (error) {
+            const code = getAuthErrorCode(error)
+
+            if (code === AuthErrorCodes.EMAIL_EXISTS) {
                 return setError('email', { type: 'alreadyInUse' })
             }
+
+            if (code === AuthErrorCodes.INVALID_EMAIL) {
+                return setError('email', { type: 'validate' })
+            }
+
+            if (code === AuthErrorCodes.WEAK_PASSWORD) {
+                return setError('password', { type: 'weak' })
+            }
+
+            console.error(error)
+            setFormError(getAuthErrorMessage(error))
         } finally {
             setIsLoading(false)
         }
@@ -86,14 +106,19 @@ const SignUpPage = () => {
 
     return (
         <>
-            <Header />
-
             {isLoading && <Loading />}
 
             <AuthContainer id="conteudo">
                 <AuthContent>
                     <AuthHeadline>Crie sua conta</AuthHeadline>
                     <AuthSubtitle>Leva menos de um minuto.</AuthSubtitle>
+
+                    {formError && (
+                        <AuthFormError role="alert">
+                            <PiWarningCircle aria-hidden="true" />
+                            {formError}
+                        </AuthFormError>
+                    )}
 
                     <AuthForm noValidate onSubmit={handleSubmit(handleSubmitPress)}>
                         <AuthFieldRow>
@@ -102,12 +127,12 @@ const SignUpPage = () => {
                                 <CustomInput
                                     id="sign-up-first-name"
                                     autoComplete="given-name"
-                                    hasError={!!errors?.fistName}
+                                    hasError={!!errors?.firstName}
                                     placeholder="Seu nome"
-                                    {...register('fistName', { required: true })}
+                                    {...register('firstName', { required: true })}
                                 />
 
-                                {errors?.fistName?.type === 'required' && (
+                                {errors?.firstName?.type === 'required' && (
                                     <InputErrorMessage>O nome é obrigatório.</InputErrorMessage>
                                 )}
                             </AuthField>
@@ -139,7 +164,7 @@ const SignUpPage = () => {
                                 {...register('email', {
                                     required: true,
                                     validate: (value) => {
-                                        return validator.isEmail(value)
+                                        return isEmail(value)
                                     }
                                 })}
                             />
@@ -179,6 +204,12 @@ const SignUpPage = () => {
                                     A senha precisa ter no mínimo 6 caracteres.
                                 </InputErrorMessage>
                             )}
+
+                            {errors?.password?.type === 'weak' && (
+                                <InputErrorMessage>
+                                    Essa senha é muito fraca. Escolha uma senha mais forte.
+                                </InputErrorMessage>
+                            )}
                         </AuthField>
 
                         <AuthField>
@@ -194,8 +225,8 @@ const SignUpPage = () => {
                                 {...register('passwordConfirmation', {
                                     required: true,
                                     minLength: 6,
-                                    validate: (value) => {
-                                        return value === watchPassword
+                                    validate: (value, formValues) => {
+                                        return value === formValues.password
                                     }
                                 })}
                             />
@@ -225,7 +256,10 @@ const SignUpPage = () => {
                     </AuthForm>
 
                     <AuthFooter>
-                        Já tem uma conta? <Link to="/login">Entrar</Link>
+                        Já tem uma conta?{' '}
+                        <Link to="/login" state={location.state}>
+                            Entrar
+                        </Link>
                     </AuthFooter>
                 </AuthContent>
             </AuthContainer>

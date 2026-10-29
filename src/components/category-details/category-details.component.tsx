@@ -1,10 +1,11 @@
-import { FunctionComponent, useEffect, useState } from 'react'
+import { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { PiArrowLeft, PiMagnifyingGlass, PiWarningCircle } from 'react-icons/pi'
 import { useNavigate } from 'react-router'
 
 // Utilities
 import { db } from '../../config/firebase.config'
+import { CategoryContext } from '../../contexts/category.context'
 import { categoryConverter } from '../../converters/firestore.converters'
 import Category from '../../types/category.types'
 
@@ -34,17 +35,25 @@ const SKELETON_ITEMS = 8
 const CategoryDetails: FunctionComponent<CategoryDetailsProps> = ({
     categoryId
 }) => {
-    const [category, setCategory] = useState<Category | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const { categories } = useContext(CategoryContext)
+    const cachedCategory = categories.find(
+        (category) => category.id === categoryId
+    )
+
+    const [fetchedCategory, setFetchedCategory] = useState<Category | null>(null)
+    const [isLoading, setIsLoading] = useState(!cachedCategory)
     const [hasError, setHasError] = useState(false)
+
+    const category = cachedCategory ?? fetchedCategory
+    const isCached = cachedCategory !== undefined
 
     const navigate = useNavigate()
 
     useEffect(() => {
+        if (isCached) return
+
         const fetchCategory = async () => {
             try {
-                setIsLoading(true)
-
                 const querySnapshot = await getDocs(
                     query(
                         collection(db, 'categories').withConverter(categoryConverter),
@@ -52,11 +61,11 @@ const CategoryDetails: FunctionComponent<CategoryDetailsProps> = ({
                     )
                 )
 
-                const category = querySnapshot.docs[0]?.data()
+                const categoryFromFirestore = querySnapshot.docs[0]?.data()
 
-                setCategory(category ?? null)
+                setFetchedCategory(categoryFromFirestore ?? null)
             } catch (error) {
-                console.log(error)
+                console.error(error)
                 setHasError(true)
             } finally {
                 setIsLoading(false)
@@ -64,7 +73,7 @@ const CategoryDetails: FunctionComponent<CategoryDetailsProps> = ({
         }
 
         fetchCategory()
-    }, [])
+    }, [isCached, categoryId])
 
     const renderContent = () => {
         if (isLoading) {
