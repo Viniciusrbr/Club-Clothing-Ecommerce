@@ -58,11 +58,11 @@ const App: FunctionComponent = () => {
 
       const userFromFirestore = querySnapshot.docs[0]?.data()
 
-      loginUser(userFromFirestore)
+      if (userFromFirestore) loginUser(userFromFirestore)
 
       return setIsInitializing(false)
     })
-  }, [])
+  }, [loginUser, logoutUser])
 
   if (isInitializing) return <Loading />
 

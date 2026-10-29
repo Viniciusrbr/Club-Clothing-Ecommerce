@@ -49,7 +49,7 @@ const Checkout: FunctionComponent = () => {
 
       window.location.href = data.url;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setHasError(true);
     } finally {
       setIsLoading(false);

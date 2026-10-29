@@ -27,8 +27,10 @@ const Categories = () => {
         useContext(CategoryContext)
 
     useEffect(() => {
-        fetchCategories()
-    }, [])
+        if (categories.length === 0) {
+            fetchCategories()
+        }
+    }, [categories.length, fetchCategories])
 
     const showSkeleton = isLoading && categories.length === 0
 
