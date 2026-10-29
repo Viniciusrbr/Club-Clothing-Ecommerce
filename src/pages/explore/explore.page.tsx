@@ -6,7 +6,9 @@ const ExplorePage = () => {
     return (
         <>
             <Header />
-            <CategoriesOverview />
+            <main id="conteudo">
+                <CategoriesOverview />
+            </main>
         </>
     )
 }

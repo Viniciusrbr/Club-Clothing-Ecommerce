@@ -101,24 +101,25 @@ const CartContextProvider = ({ children }) => {
   };
 
   const addProductToCart = (product: Product) => {
-    // verificar se o produto já está no carrinho
-    const productIsAlreadyInCart = products.some(
-      (item) => item.id === product.id
-    );
+    setProducts((prevState) => {
+      // verificar se o produto já está no carrinho (usando o estado mais recente,
+      // para que cliques rápidos não dupliquem o item)
+      const productIsAlreadyInCart = prevState.some(
+        (item) => item.id === product.id
+      );
 
-    // se sim -> aumentar sua quantidade
-    if (productIsAlreadyInCart) {
-      return setProducts((products) =>
-        products.map((item) =>
+      // se sim -> aumentar sua quantidade
+      if (productIsAlreadyInCart) {
+        return prevState.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
-        )
-      );
-    }
+        );
+      }
 
-    // se não -> adicioná-lo
-    setProducts((prevState) => [...prevState, { ...product, quantity: 1 }]);
+      // se não -> adicioná-lo
+      return [...prevState, { ...product, quantity: 1 }];
+    });
   };
 
   const removeProductFromCart = (productId: string) => {

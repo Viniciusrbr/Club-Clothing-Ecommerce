@@ -9,22 +9,27 @@ import Category from '../types/category.types'
 interface ICategoryContext {
     categories: Category[]
     isLoading: boolean
+    hasError: boolean
     fetchCategories: () => Promise<void>
 }
 
 export const CategoryContext = createContext<ICategoryContext>({
     categories: [],
     isLoading: false,
+    hasError: false,
     fetchCategories: () => Promise.resolve()
 })
 
 const CategoryContextProvider = ({ children }) => {
     const [categories, setCategories] = useState<Category[]>([])
-    const [isLoading, setIsLoading] = useState(false)
+    // Começa como true para exibir o skeleton até a primeira busca terminar
+    const [isLoading, setIsLoading] = useState(true)
+    const [hasError, setHasError] = useState(false)
 
     const fetchCategories = async () => {
         try {
             setIsLoading(true)
+            setHasError(false)
 
             const categoriesFromFirestore: Category[] = []
 
@@ -39,6 +44,7 @@ const CategoryContextProvider = ({ children }) => {
             setCategories(categoriesFromFirestore)
         } catch (error) {
             console.log({ error })
+            setHasError(true)
         } finally {
             setIsLoading(false)
         }
@@ -46,7 +52,7 @@ const CategoryContextProvider = ({ children }) => {
 
     return (
         <CategoryContext.Provider
-            value={{ categories, isLoading, fetchCategories }}>
+            value={{ categories, isLoading, hasError, fetchCategories }}>
             {children}
         </CategoryContext.Provider>
     )

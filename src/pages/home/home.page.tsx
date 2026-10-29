@@ -6,7 +6,9 @@ const HomePage = () => {
     <>
       <Header />
 
-      <Categories />
+      <main id="conteudo">
+        <Categories />
+      </main>
     </>
   )
 }

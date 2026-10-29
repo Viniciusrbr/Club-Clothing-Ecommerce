@@ -1,16 +1,23 @@
 import { FunctionComponent, useContext } from 'react'
-import { AiOutlinePlus, AiOutlineMinus, AiOutlineClose } from 'react-icons/ai'
+import { PiMinus, PiPlus, PiTrash } from 'react-icons/pi'
 import { CartContext } from '../../contexts/cart.context'
 
 // Utilities
 import CartProduct from '../../types/cart.types'
+import formatPrice from '../../helpers/format-price'
 
 // Styles
 import {
     CartItemContainer,
+    CartItemFooter,
+    CartItemHeader,
     CartItemImage,
     CartItemInfo,
+    CartItemName,
+    CartItemPrice,
     CartItemQuantity,
+    CartItemSubtotal,
+    QuantityButton,
     RemoveButton
 } from './cart-item.styles'
 
@@ -39,22 +46,45 @@ const CartItem: FunctionComponent<CartItemProps> = ({ product }) => {
 
     return (
         <CartItemContainer>
-            <CartItemImage imageUrl={product.imageUrl} />
+            <CartItemImage src={product.imageUrl} alt={product.name} loading="lazy" />
 
             <CartItemInfo>
-                <p>{product.name}</p>
-                <p>R${product.price}</p>
+                <CartItemHeader>
+                    <div>
+                        <CartItemName>{product.name}</CartItemName>
+                        <CartItemPrice>{formatPrice(product.price)}</CartItemPrice>
+                    </div>
 
-                <CartItemQuantity>
-                    <AiOutlineMinus size={20} onClick={handleDecreaseClick} />
-                    <p>{product.quantity}</p>
-                    <AiOutlinePlus size={20} onClick={handleIncreaseClick} />
-                </CartItemQuantity>
+                    <RemoveButton
+                        type="button"
+                        onClick={handleRemoveClick}
+                        aria-label={`Remover ${product.name} do carrinho`}>
+                        <PiTrash size={18} aria-hidden="true" />
+                    </RemoveButton>
+                </CartItemHeader>
+
+                <CartItemFooter>
+                    <CartItemQuantity role="group" aria-label={`Quantidade de ${product.name}`}>
+                        <QuantityButton
+                            type="button"
+                            onClick={handleDecreaseClick}
+                            aria-label="Diminuir quantidade">
+                            <PiMinus size={14} aria-hidden="true" />
+                        </QuantityButton>
+                        <span aria-live="polite">{product.quantity}</span>
+                        <QuantityButton
+                            type="button"
+                            onClick={handleIncreaseClick}
+                            aria-label="Aumentar quantidade">
+                            <PiPlus size={14} aria-hidden="true" />
+                        </QuantityButton>
+                    </CartItemQuantity>
+
+                    <CartItemSubtotal>
+                        {formatPrice(product.price * product.quantity)}
+                    </CartItemSubtotal>
+                </CartItemFooter>
             </CartItemInfo>
-
-            <RemoveButton onClick={handleRemoveClick}>
-                <AiOutlineClose size={25} />
-            </RemoveButton>
         </CartItemContainer>
     )
 }

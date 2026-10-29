@@ -1,25 +1,33 @@
 import styled from 'styled-components'
 import Colors from '../../theme/theme.colors'
+import Tokens from '../../theme/theme.tokens'
 
 type CustomInputContainerProps = {
-    hasError?: boolean
+    $hasError?: boolean
 }
 
 export const CustomInputContainer = styled.input<CustomInputContainerProps>`
-  border: none;
   width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  font-size: 1rem;
   background-color: ${Colors.input.background};
-  padding: 10px 20px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 10px;
+  border-radius: ${Tokens.radius.sm};
   color: ${Colors.text.dark};
-  border: ${(props) => (props.hasError ? `2px solid ${Colors.error}` : 'none')};
+  border: ${(props) => (props.$hasError ? `2px solid ${Colors.error}` : 'none')};
+  transition: background-color 200ms ${Tokens.easing.out};
+
   &::placeholder {
-    color: ${(props) =>
-        props.hasError ? Colors.error : Colors.input.placeholder};
+    color: ${Colors.input.placeholder};
   }
+
+  &:hover {
+    background-color: #E9E5DD;
+  }
+
   &:focus {
-    outline: ${(props) =>
-        props.hasError ? 'none' : `2px solid ${Colors.input.placeholder}`};
+    outline: 2px solid ${(props) => (props.$hasError ? Colors.error : Colors.text.dark)};
+    outline-offset: 2px;
+    background-color: ${Colors.background.white};
   }
 `

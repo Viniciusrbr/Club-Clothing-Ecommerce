@@ -8,8 +8,15 @@ interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const CustomInput: FunctionComponent<CustomInputProps> = React.forwardRef(
-    (props, ref) => {
-        return <CustomInputContainer {...props} ref={ref as any} />
+    ({ hasError, ...props }, ref) => {
+        return (
+            <CustomInputContainer
+                $hasError={hasError}
+                aria-invalid={hasError || undefined}
+                {...props}
+                ref={ref as any}
+            />
+        )
     }
 )
 

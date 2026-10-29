@@ -6,7 +6,9 @@ const CheckoutPage = () => {
     return (
         <>
             <Header />
-            <Checkout />
+            <main id="conteudo">
+                <Checkout />
+            </main>
         </>
     )
 }

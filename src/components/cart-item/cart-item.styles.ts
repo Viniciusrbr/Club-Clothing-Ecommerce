@@ -1,61 +1,124 @@
 import styled from 'styled-components'
 import Colors from '../../theme/theme.colors'
-
-interface CartItemImageProps {
-    imageUrl: string
-}
+import Tokens from '../../theme/theme.tokens'
 
 export const CartItemContainer = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  p {
-    color: ${Colors.text.dark};
+  gap: 16px;
+  padding: 16px 0;
+
+  & + & {
+    border-top: 1px solid ${Colors.border};
   }
 `
 
-export const CartItemImage = styled.div<CartItemImageProps>`
-  background-image: ${(props) => `url('${props.imageUrl}')`};
-  height: 250px;
-  width: 170px;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  display: block;
-  border-radius: 10px;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+export const CartItemImage = styled.img`
+  flex-shrink: 0;
+  width: 88px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: ${Tokens.radius.sm};
+  background-color: ${Colors.background.surface};
 `
 
 export const CartItemInfo = styled.div`
   display: flex;
   flex-direction: column;
-  margin-left: 20px;
+  justify-content: space-between;
   flex: 1;
-  p:nth-child(1) {
-    font-weight: 600;
-    margin-bottom: 5px;
-  }
-  p:nth-child(2) {
-    font-weight: 500;
-  }
+  min-width: 0;
+`
+
+export const CartItemHeader = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+`
+
+export const CartItemName = styled.p`
+  font-weight: 500;
+  line-height: 1.35;
+  color: ${Colors.text.dark};
+`
+
+export const CartItemPrice = styled.p`
+  margin-top: 2px;
+  font-size: 0.875rem;
+  color: ${Colors.text.muted};
+  font-variant-numeric: tabular-nums;
+`
+
+export const CartItemFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
 `
 
 export const CartItemQuantity = styled.div`
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  margin-top: 10px;
-  p {
-    margin-left: 10px;
-    margin-right: 10px;
-  }
-  svg:hover {
-    cursor: pointer;
+  border-radius: ${Tokens.radius.sm};
+  box-shadow: inset 0 0 0 1px ${Colors.border};
+
+  span {
+    min-width: 28px;
+    text-align: center;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
   }
 `
 
-export const RemoveButton = styled.div`
-  margin-right: 20px;
+export const QuantityButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: ${Tokens.radius.sm};
+  background: none;
+  color: ${Colors.text.dark};
+  cursor: pointer;
+  transition: background-color 200ms ${Tokens.easing.out};
+
   &:hover {
-    cursor: pointer;
+    background-color: ${Colors.background.surface};
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+`
+
+export const CartItemSubtotal = styled.p`
+  font-weight: 600;
+  color: ${Colors.text.dark};
+  font-variant-numeric: tabular-nums;
+`
+
+export const RemoveButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin: -8px -10px 0 0;
+  border: none;
+  border-radius: ${Tokens.radius.sm};
+  background: none;
+  color: ${Colors.text.muted};
+  cursor: pointer;
+  transition:
+    background-color 200ms ${Tokens.easing.out},
+    color 200ms ${Tokens.easing.out};
+
+  &:hover {
+    background-color: ${Colors.background.surface};
+    color: ${Colors.error};
   }
 `

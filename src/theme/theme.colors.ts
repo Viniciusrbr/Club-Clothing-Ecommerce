@@ -1,19 +1,23 @@
 const Colors = {
-    primary: '#212529',
+    primary: '#1F1D1A',
+    accent: '#9C4F2E',
     text: {
-        white: '#F8F9FA',
-        dark: '#343A40'
+        white: '#F7F5F1',
+        dark: '#1F1D1A',
+        muted: '#6E6A63'
     },
     background: {
-        dark: '#212529',
-        white: '#F8F9FA'
+        dark: '#1F1D1A',
+        white: '#F7F5F1',
+        surface: '#EFECE6'
     },
+    border: '#E2DDD4',
     input: {
-        background: '#E9ECEF',
-        placeholder: '#6C757D'
+        background: '#EFECE6',
+        placeholder: '#7A756C'
     },
-    error: '#FF6A6A',
-    success: '#198754'
+    error: '#B3261E',
+    success: '#2E6B4E'
 }
 
 export default Colors

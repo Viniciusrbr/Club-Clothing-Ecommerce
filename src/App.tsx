@@ -21,6 +21,7 @@ import CategoryDetailsPage from './pages/category-details/category-details.page'
 import Cart from './components/cart/cart.component'
 import AuthenticationGuard from './guards/authentication.guard'
 import PaymentConfirmationPage from './pages/payment-confirmation/payment-confirmation.page'
+import NotFoundPage from './pages/not-found/not-found.page'
 
 const App: FunctionComponent = () => {
   const [isInitializing, setIsInitializing] = useState(true)
@@ -78,6 +79,7 @@ const App: FunctionComponent = () => {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       <Cart />

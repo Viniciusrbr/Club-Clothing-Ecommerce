@@ -1,7 +1,7 @@
-import { FiLogIn } from 'react-icons/fi'
+import { PiUserPlus } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
 import validator from 'validator'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useContext, useEffect, useState } from 'react'
 
 // Components
@@ -13,11 +13,16 @@ import Loading from '../../components/loading/loading.component'
 
 // Styles
 import {
-    SignUpContainer,
-    SignUpContent,
-    SignUpHeadline,
-    SignUpInputContainer
-} from './sign-up.styles'
+    AuthContainer,
+    AuthContent,
+    AuthField,
+    AuthFieldRow,
+    AuthFooter,
+    AuthForm,
+    AuthHeadline,
+    AuthLabel,
+    AuthSubtitle
+} from '../auth.styles'
 
 // Firebase
 import { AuthError, AuthErrorCodes, createUserWithEmailAndPassword } from 'firebase/auth'
@@ -85,125 +90,145 @@ const SignUpPage = () => {
 
             {isLoading && <Loading />}
 
-            <SignUpContainer>
-                <SignUpContent>
-                    <SignUpHeadline>Crie sua conta</SignUpHeadline>
+            <AuthContainer id="conteudo">
+                <AuthContent>
+                    <AuthHeadline>Crie sua conta</AuthHeadline>
+                    <AuthSubtitle>Leva menos de um minuto.</AuthSubtitle>
 
-                    <SignUpInputContainer>
-                        <p>Nome</p>
-                        <CustomInput
-                            hasError={!!errors?.fistName}
-                            placeholder="Digite seu nome"
-                            {...register('fistName', { required: true })}
-                        />
+                    <AuthForm noValidate onSubmit={handleSubmit(handleSubmitPress)}>
+                        <AuthFieldRow>
+                            <AuthField>
+                                <AuthLabel htmlFor="sign-up-first-name">Nome</AuthLabel>
+                                <CustomInput
+                                    id="sign-up-first-name"
+                                    autoComplete="given-name"
+                                    hasError={!!errors?.fistName}
+                                    placeholder="Seu nome"
+                                    {...register('fistName', { required: true })}
+                                />
 
-                        {errors?.fistName?.type === 'required' && (
-                            <InputErrorMessage>O nome é obrigatório.</InputErrorMessage>
-                        )}
-                    </SignUpInputContainer>
+                                {errors?.fistName?.type === 'required' && (
+                                    <InputErrorMessage>O nome é obrigatório.</InputErrorMessage>
+                                )}
+                            </AuthField>
 
-                    <SignUpInputContainer>
-                        <p>Sobrenome</p>
-                        <CustomInput
-                            hasError={!!errors?.lastName}
-                            placeholder="Digite seu sobrenome"
-                            {...register('lastName', { required: true })}
-                        />
+                            <AuthField>
+                                <AuthLabel htmlFor="sign-up-last-name">Sobrenome</AuthLabel>
+                                <CustomInput
+                                    id="sign-up-last-name"
+                                    autoComplete="family-name"
+                                    hasError={!!errors?.lastName}
+                                    placeholder="Seu sobrenome"
+                                    {...register('lastName', { required: true })}
+                                />
 
-                        {errors?.lastName?.type === 'required' && (
-                            <InputErrorMessage>O sobrenome é obrigatório.</InputErrorMessage>
-                        )}
-                    </SignUpInputContainer>
+                                {errors?.lastName?.type === 'required' && (
+                                    <InputErrorMessage>O sobrenome é obrigatório.</InputErrorMessage>
+                                )}
+                            </AuthField>
+                        </AuthFieldRow>
 
-                    <SignUpInputContainer>
-                        <p>E-mail</p>
-                        <CustomInput
-                            hasError={!!errors?.email}
-                            placeholder="Digite seu e-mail"
-                            {...register('email', {
-                                required: true,
-                                validate: (value) => {
-                                    return validator.isEmail(value)
-                                }
-                            })}
-                        />
+                        <AuthField>
+                            <AuthLabel htmlFor="sign-up-email">E-mail</AuthLabel>
+                            <CustomInput
+                                id="sign-up-email"
+                                type="email"
+                                autoComplete="email"
+                                hasError={!!errors?.email}
+                                placeholder="voce@email.com"
+                                {...register('email', {
+                                    required: true,
+                                    validate: (value) => {
+                                        return validator.isEmail(value)
+                                    }
+                                })}
+                            />
 
-                        {errors?.email?.type === 'required' && (
-                            <InputErrorMessage>O e-mail é obrigatório.</InputErrorMessage>
-                        )}
+                            {errors?.email?.type === 'required' && (
+                                <InputErrorMessage>O e-mail é obrigatório.</InputErrorMessage>
+                            )}
 
-                        {errors?.email?.type === 'alreadyInUse' && (
-                            <InputErrorMessage>Este email já está sendo utilizado.</InputErrorMessage>
-                        )}
+                            {errors?.email?.type === 'alreadyInUse' && (
+                                <InputErrorMessage>Este email já está sendo utilizado.</InputErrorMessage>
+                            )}
 
-                        {errors?.email?.type === 'validate' && (
-                            <InputErrorMessage>
-                                Por favor, insira um e-mail válido.
-                            </InputErrorMessage>
-                        )}
-                    </SignUpInputContainer>
+                            {errors?.email?.type === 'validate' && (
+                                <InputErrorMessage>
+                                    Por favor, insira um e-mail válido.
+                                </InputErrorMessage>
+                            )}
+                        </AuthField>
 
-                    <SignUpInputContainer>
-                        <p>Senha</p>
-                        <CustomInput
-                            hasError={!!errors?.password}
-                            placeholder="Digite sua senha"
-                            type="password"
-                            {...register('password', { required: true, minLength: 6 })}
-                        />
+                        <AuthField>
+                            <AuthLabel htmlFor="sign-up-password">Senha</AuthLabel>
+                            <CustomInput
+                                id="sign-up-password"
+                                type="password"
+                                autoComplete="new-password"
+                                hasError={!!errors?.password}
+                                placeholder="No mínimo 6 caracteres"
+                                {...register('password', { required: true, minLength: 6 })}
+                            />
 
-                        {errors?.password?.type === 'required' && (
-                            <InputErrorMessage>A senha é obrigatória.</InputErrorMessage>
-                        )}
+                            {errors?.password?.type === 'required' && (
+                                <InputErrorMessage>A senha é obrigatória.</InputErrorMessage>
+                            )}
 
-                        {errors?.password?.type === 'minLength' && (
-                            <InputErrorMessage>
-                                A senha precisa ter no mínimo 6 caracteres.
-                            </InputErrorMessage>
-                        )}
-                    </SignUpInputContainer>
+                            {errors?.password?.type === 'minLength' && (
+                                <InputErrorMessage>
+                                    A senha precisa ter no mínimo 6 caracteres.
+                                </InputErrorMessage>
+                            )}
+                        </AuthField>
 
-                    <SignUpInputContainer>
-                        <p>Confirmação de Senha</p>
-                        <CustomInput
-                            hasError={!!errors?.passwordConfirmation}
-                            placeholder="Digite novamente sua senha"
-                            type="password"
-                            {...register('passwordConfirmation', {
-                                required: true,
-                                minLength: 6,
-                                validate: (value) => {
-                                    return value === watchPassword
-                                }
-                            })}
-                        />
+                        <AuthField>
+                            <AuthLabel htmlFor="sign-up-password-confirmation">
+                                Confirmação de senha
+                            </AuthLabel>
+                            <CustomInput
+                                id="sign-up-password-confirmation"
+                                type="password"
+                                autoComplete="new-password"
+                                hasError={!!errors?.passwordConfirmation}
+                                placeholder="Digite a senha novamente"
+                                {...register('passwordConfirmation', {
+                                    required: true,
+                                    minLength: 6,
+                                    validate: (value) => {
+                                        return value === watchPassword
+                                    }
+                                })}
+                            />
 
-                        {errors?.passwordConfirmation?.type === 'required' && (
-                            <InputErrorMessage>
-                                A confirmação de senha é obrigatória.
-                            </InputErrorMessage>
-                        )}
+                            {errors?.passwordConfirmation?.type === 'required' && (
+                                <InputErrorMessage>
+                                    A confirmação de senha é obrigatória.
+                                </InputErrorMessage>
+                            )}
 
-                        {errors?.passwordConfirmation?.type === 'minLength' && (
-                            <InputErrorMessage>
-                                A confirmação de senha precisa ter no mínimo 6 caracteres.
-                            </InputErrorMessage>
-                        )}
+                            {errors?.passwordConfirmation?.type === 'minLength' && (
+                                <InputErrorMessage>
+                                    A confirmação de senha precisa ter no mínimo 6 caracteres.
+                                </InputErrorMessage>
+                            )}
 
-                        {errors?.passwordConfirmation?.type === 'validate' && (
-                            <InputErrorMessage>
-                                A confirmação de senha precisa ser igual a senha.
-                            </InputErrorMessage>
-                        )}
-                    </SignUpInputContainer>
+                            {errors?.passwordConfirmation?.type === 'validate' && (
+                                <InputErrorMessage>
+                                    A confirmação de senha precisa ser igual a senha.
+                                </InputErrorMessage>
+                            )}
+                        </AuthField>
 
-                    <CustomButton
-                        onClick={() => handleSubmit(handleSubmitPress)()}
-                        startIcon={<FiLogIn size={18} />}>
-                        Criar Conta
-                    </CustomButton>
-                </SignUpContent>
-            </SignUpContainer>
+                        <CustomButton type="submit" startIcon={<PiUserPlus />}>
+                            Criar conta
+                        </CustomButton>
+                    </AuthForm>
+
+                    <AuthFooter>
+                        Já tem uma conta? <Link to="/login">Entrar</Link>
+                    </AuthFooter>
+                </AuthContent>
+            </AuthContainer>
         </>
     )
 }

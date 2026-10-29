@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react'
 import { SyncLoader } from 'react-spinners'
 
+import Colors from '../../theme/theme.colors'
 import { LoadingContainer } from './loading.styles'
 
 interface LoadingProps {
@@ -9,9 +10,9 @@ interface LoadingProps {
 
 const Loading: FunctionComponent<LoadingProps> = ({ message }) => {
   return (
-    <LoadingContainer>
+    <LoadingContainer role="status" aria-live="polite">
       {message && <p>{message}</p>}
-      <SyncLoader size={30} />
+      <SyncLoader size={10} margin={4} color={Colors.text.white} />
     </LoadingContainer>
   )
 }

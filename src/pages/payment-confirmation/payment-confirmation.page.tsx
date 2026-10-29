@@ -1,27 +1,20 @@
 import { FunctionComponent, useContext, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import {
-    AiOutlineCheckCircle,
-    AiOutlineCloseCircle,
-    AiOutlineHome
-} from 'react-icons/ai'
+import { PiCheckCircle, PiXCircle } from 'react-icons/pi'
 
 // Styles
-import {
-    PaymentConfirmationContainer,
-    PaymentConfirmationContent
-} from './payment-confirmation.styles'
+import { PaymentConfirmationContainer } from './payment-confirmation.styles'
 
 // Components
 import Header from '../../components/header/header.component'
 import CustomButton from '../../components/custom-button/custom-button.component'
+import StatusMessage from '../../components/status-message/status-message.component'
 
 // Utilities
-import Colors from '../../theme/theme.colors'
 import { CartContext } from '../../contexts/cart.context'
 
 const PaymentConfirmationPage: FunctionComponent = () => {
-    const { clearProducts } = useContext(CartContext)
+    const { clearProducts, toggleCart } = useContext(CartContext)
 
     const [searchParams] = useSearchParams()
 
@@ -29,6 +22,7 @@ const PaymentConfirmationPage: FunctionComponent = () => {
 
     const status = searchParams.get('success')
     const isCanceled = searchParams.get('canceled') === 'true'
+    const hasFailed = status === 'false' || isCanceled
 
     useEffect(() => {
         if (status === 'true') {
@@ -43,31 +37,41 @@ const PaymentConfirmationPage: FunctionComponent = () => {
     return (
         <>
             <Header />
-            <PaymentConfirmationContainer>
-                <PaymentConfirmationContent>
-                    {status === 'true' && (
-                        <>
-                            <AiOutlineCheckCircle size={120} color={Colors.success} />
-                            <p>Sua compra foi finalizada com sucesso!</p>
-                        </>
-                    )}
+            <PaymentConfirmationContainer id="conteudo">
+                {status === 'true' && (
+                    <StatusMessage
+                        tone="success"
+                        icon={<PiCheckCircle />}
+                        title="Compra confirmada"
+                        description="Recebemos seu pagamento. Obrigado por comprar na Club Clothing.">
+                        <CustomButton onClick={handleGoToHomePageClick}>
+                            Voltar para o início
+                        </CustomButton>
+                    </StatusMessage>
+                )}
 
-                    {(status === 'false' || isCanceled) && (
-                        <>
-                            <AiOutlineCloseCircle size={120} color={Colors.error} />
-                            <p>
-                                Ocorreu um erro ao finalizar sua compra. Por favor, tente
-                                novamente.
-                            </p>
-                        </>
-                    )}
+                {hasFailed && (
+                    <StatusMessage
+                        tone="error"
+                        icon={<PiXCircle />}
+                        title="Não foi possível finalizar a compra"
+                        description="Seus produtos continuam no carrinho. Tente novamente quando quiser.">
+                        <CustomButton onClick={toggleCart}>Abrir carrinho</CustomButton>
+                        <CustomButton variant="secondary" onClick={handleGoToHomePageClick}>
+                            Voltar para o início
+                        </CustomButton>
+                    </StatusMessage>
+                )}
 
-                    <CustomButton
-                        startIcon={<AiOutlineHome />}
-                        onClick={handleGoToHomePageClick}>
-                        Ir para a Página Inicial
-                    </CustomButton>
-                </PaymentConfirmationContent>
+                {status !== 'true' && !hasFailed && (
+                    <StatusMessage
+                        title="Nenhum pagamento em andamento"
+                        description="Volte para a loja para continuar comprando.">
+                        <CustomButton onClick={handleGoToHomePageClick}>
+                            Voltar para o início
+                        </CustomButton>
+                    </StatusMessage>
+                )}
             </PaymentConfirmationContainer>
         </>
     )

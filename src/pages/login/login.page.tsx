@@ -1,9 +1,8 @@
-import { BsGoogle } from 'react-icons/bs'
-import { FiLogIn } from 'react-icons/fi'
+import { PiGoogleLogo, PiSignIn } from 'react-icons/pi'
 import { useForm } from 'react-hook-form'
 import validator from 'validator'
 import { useEffect, useContext, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 // Components
 import CustomButton from '../../components/custom-button/custom-button.component'
@@ -14,12 +13,16 @@ import Loading from '../../components/loading/loading.component'
 
 // Styles
 import {
-    LoginContainer,
-    LoginContent,
-    LoginHeadline,
-    LoginInputContainer,
-    LoginSubtitle
-} from './login.styles'
+    AuthContainer,
+    AuthContent,
+    AuthDivider,
+    AuthField,
+    AuthFooter,
+    AuthForm,
+    AuthHeadline,
+    AuthLabel,
+    AuthSubtitle
+} from '../auth.styles'
 
 // Firebase
 import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
@@ -62,13 +65,7 @@ const LoginPage = () => {
     const handleSubmitPress = async (data: LoginForm) => {
         try {
             setIsLoading(true)
-            const userCredentials = await signInWithEmailAndPassword(
-                auth,
-                data.email,
-                data.password
-            )
-
-            console.log({ userCredentials })
+            await signInWithEmailAndPassword(auth, data.email, data.password)
         } catch (error) {
             const _error = error as AuthError
 
@@ -127,85 +124,96 @@ const LoginPage = () => {
 
             {isLoading && <Loading />}
 
-            <LoginContainer>
-                <LoginContent>
-                    <LoginHeadline>Entre com a sua conta</LoginHeadline>
+            <AuthContainer id="conteudo">
+                <AuthContent>
+                    <AuthHeadline>Entre com a sua conta</AuthHeadline>
+                    <AuthSubtitle>Acesse seu carrinho e finalize suas compras.</AuthSubtitle>
 
                     <CustomButton
-                        startIcon={<BsGoogle size={18} />}
+                        variant="secondary"
+                        startIcon={<PiGoogleLogo />}
                         onClick={handleSignInWithGooglePress}>
                         Entrar com o Google
                     </CustomButton>
 
-                    <LoginSubtitle>ou entre com o seu e-mail</LoginSubtitle>
+                    <AuthDivider>ou entre com o seu e-mail</AuthDivider>
 
-                    <LoginInputContainer>
-                        <p>E-mail</p>
-                        <CustomInput
-                            hasError={!!errors?.email}
-                            placeholder="Digite seu e-mail"
-                            {...register('email', {
-                                required: true,
-                                validate: (value) => {
-                                    return validator.isEmail(value)
-                                }
-                            })}
-                        />
+                    <AuthForm noValidate onSubmit={handleSubmit(handleSubmitPress)}>
+                        <AuthField>
+                            <AuthLabel htmlFor="login-email">E-mail</AuthLabel>
+                            <CustomInput
+                                id="login-email"
+                                type="email"
+                                autoComplete="email"
+                                hasError={!!errors?.email}
+                                placeholder="voce@email.com"
+                                {...register('email', {
+                                    required: true,
+                                    validate: (value) => {
+                                        return validator.isEmail(value)
+                                    }
+                                })}
+                            />
 
-                        {errors?.email?.type === 'required' && (
-                            <InputErrorMessage>O e-mail é obrigatório.</InputErrorMessage>
-                        )}
+                            {errors?.email?.type === 'required' && (
+                                <InputErrorMessage>O e-mail é obrigatório.</InputErrorMessage>
+                            )}
 
-                        {errors?.email?.type === 'notFound' && (
-                            <InputErrorMessage>
-                                O e-mail não foi encontrado.
-                            </InputErrorMessage>
-                        )}
+                            {errors?.email?.type === 'notFound' && (
+                                <InputErrorMessage>
+                                    O e-mail não foi encontrado.
+                                </InputErrorMessage>
+                            )}
 
-                        {errors?.email?.type === 'invalid' && (
-                            <InputErrorMessage>
-                                Usuário e/ou senha inválidos.
-                            </InputErrorMessage>
-                        )}
+                            {errors?.email?.type === 'invalid' && (
+                                <InputErrorMessage>
+                                    Usuário e/ou senha inválidos.
+                                </InputErrorMessage>
+                            )}
 
-                        {errors?.email?.type === 'validate' && (
-                            <InputErrorMessage>
-                                Por favor, insira um e-mail válido.
-                            </InputErrorMessage>
-                        )}
-                    </LoginInputContainer>
+                            {errors?.email?.type === 'validate' && (
+                                <InputErrorMessage>
+                                    Por favor, insira um e-mail válido.
+                                </InputErrorMessage>
+                            )}
+                        </AuthField>
 
-                    <LoginInputContainer>
-                        <p>Senha</p>
-                        <CustomInput
-                            hasError={!!errors?.password}
-                            placeholder="Digite sua senha"
-                            type="password"
-                            {...register('password', { required: true })}
-                        />
+                        <AuthField>
+                            <AuthLabel htmlFor="login-password">Senha</AuthLabel>
+                            <CustomInput
+                                id="login-password"
+                                type="password"
+                                autoComplete="current-password"
+                                hasError={!!errors?.password}
+                                placeholder="Digite sua senha"
+                                {...register('password', { required: true })}
+                            />
 
-                        {errors?.password?.type === 'required' && (
-                            <InputErrorMessage>A senha é obrigatória.</InputErrorMessage>
-                        )}
+                            {errors?.password?.type === 'required' && (
+                                <InputErrorMessage>A senha é obrigatória.</InputErrorMessage>
+                            )}
 
-                        {errors?.password?.type === 'mismatch' && (
-                            <InputErrorMessage>A senha é inválida.</InputErrorMessage>
-                        )}
+                            {errors?.password?.type === 'mismatch' && (
+                                <InputErrorMessage>A senha é inválida.</InputErrorMessage>
+                            )}
 
-                        {errors?.password?.type === 'invalid' && (
-                            <InputErrorMessage>
-                                Usuário e/ou senha inválidos.
-                            </InputErrorMessage>
-                        )}
-                    </LoginInputContainer>
+                            {errors?.password?.type === 'invalid' && (
+                                <InputErrorMessage>
+                                    Usuário e/ou senha inválidos.
+                                </InputErrorMessage>
+                            )}
+                        </AuthField>
 
-                    <CustomButton
-                        startIcon={<FiLogIn size={18} />}
-                        onClick={() => handleSubmit(handleSubmitPress)()}>
-                        Entrar
-                    </CustomButton>
-                </LoginContent>
-            </LoginContainer>
+                        <CustomButton type="submit" startIcon={<PiSignIn />}>
+                            Entrar
+                        </CustomButton>
+                    </AuthForm>
+
+                    <AuthFooter>
+                        Ainda não tem uma conta? <Link to="/sign-up">Criar conta</Link>
+                    </AuthFooter>
+                </AuthContent>
+            </AuthContainer>
         </>
     )
 }

@@ -12,7 +12,9 @@ const CategoryDetailsPage = () => {
     return (
         <>
             <Header />
-            <CategoryDetails categoryId={id} />
+            <main id="conteudo">
+                <CategoryDetails key={id} categoryId={id} />
+            </main>
         </>
     )
 }
