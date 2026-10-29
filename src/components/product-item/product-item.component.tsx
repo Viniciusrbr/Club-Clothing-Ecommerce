@@ -17,7 +17,7 @@ import {
 
 // Utilities
 import Product from '../../types/product.types'
-import { CartContext } from '../../contexts/cart.context'
+import { CartActionsContext } from '../../contexts/cart.context'
 import formatPrice from '../../helpers/format-price'
 
 interface ProductItemProps {
@@ -30,7 +30,7 @@ const ProductItem: FunctionComponent<ProductItemProps> = ({ product }) => {
     const [isAdded, setIsAdded] = useState(false)
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-    const { addProductToCart } = useContext(CartContext)
+    const { addProductToCart } = useContext(CartActionsContext)
 
     useEffect(() => {
         return () => clearTimeout(timeoutRef.current)

@@ -11,10 +11,10 @@ import CustomButton from '../../components/custom-button/custom-button.component
 import StatusMessage from '../../components/status-message/status-message.component'
 
 // Utilities
-import { CartContext } from '../../contexts/cart.context'
+import { CartActionsContext } from '../../contexts/cart.context'
 
 const PaymentConfirmationPage: FunctionComponent = () => {
-    const { clearProducts, toggleCart } = useContext(CartContext)
+    const { clearProducts, toggleCart } = useContext(CartActionsContext)
 
     const [searchParams] = useSearchParams()
 
@@ -28,7 +28,7 @@ const PaymentConfirmationPage: FunctionComponent = () => {
         if (status === 'true') {
             clearProducts()
         }
-    }, [status])
+    }, [status, clearProducts])
 
     const handleGoToHomePageClick = () => {
         navigate('/')

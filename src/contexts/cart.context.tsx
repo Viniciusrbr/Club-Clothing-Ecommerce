@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useEffect, useMemo, useState } from "react";
 import CartProduct from "../types/cart.types";
 import Product from "../types/product.types";
 
@@ -7,6 +7,9 @@ interface ICartContext {
   productsTotalPrice: number;
   productsCount: number;
   products: CartProduct[];
+}
+
+interface ICartActionsContext {
   toggleCart: () => void;
   addProductToCart: (product: Product) => void;
   removeProductFromCart: (productId: string) => void;
@@ -20,6 +23,9 @@ export const CartContext = createContext<ICartContext>({
   productsTotalPrice: 0,
   productsCount: 0,
   products: [],
+});
+
+export const CartActionsContext = createContext<ICartActionsContext>({
   toggleCart: () => { },
   addProductToCart: () => { },
   removeProductFromCart: () => { },
@@ -47,7 +53,7 @@ const getStoredCartProducts = (): CartProduct[] => {
   return [];
 };
 
-const CartContextProvider = ({ children }) => {
+const CartContextProvider = ({ children }: { children: ReactNode }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [products, setProducts] = useState<CartProduct[]>(
     getStoredCartProducts
@@ -65,97 +71,89 @@ const CartContextProvider = ({ children }) => {
     }
   }, [products]);
 
-  const productsTotalPrice = useMemo(() => {
-    if (!products || products.length === 0) return 0;
-
-    return products.reduce((acc, currentProduct) => {
-      return acc + currentProduct.price * currentProduct.quantity;
-    }, 0);
+  const { productsTotalPrice, productsCount } = useMemo(() => {
+    return products.reduce(
+      (acc, currentProduct) => ({
+        productsTotalPrice:
+          acc.productsTotalPrice + currentProduct.price * currentProduct.quantity,
+        productsCount: acc.productsCount + currentProduct.quantity,
+      }),
+      { productsTotalPrice: 0, productsCount: 0 }
+    );
   }, [products]);
 
-  const productsCount = useMemo(() => {
-    if (!products || products.length === 0) return 0;
+  const actions = useMemo<ICartActionsContext>(
+    () => ({
+      toggleCart: () => {
+        setIsVisible((prevState) => !prevState);
+      },
 
-    return products.reduce((acc, currentProduct) => {
-      return acc + currentProduct.quantity;
-    }, 0);
-  }, [products]);
+      addProductToCart: (product: Product) => {
+        setProducts((prevState) => {
+          // verificar se o produto já está no carrinho (usando o estado mais recente,
+          // para que cliques rápidos não dupliquem o item)
+          const productIsAlreadyInCart = prevState.some(
+            (item) => item.id === product.id
+          );
 
-  const toggleCart = () => {
-    setIsVisible((prevState) => !prevState);
-  };
+          // se sim -> aumentar sua quantidade
+          if (productIsAlreadyInCart) {
+            return prevState.map((item) =>
+              item.id === product.id
+                ? { ...item, quantity: item.quantity + 1 }
+                : item
+            );
+          }
 
-  const addProductToCart = (product: Product) => {
-    setProducts((prevState) => {
-      // verificar se o produto já está no carrinho (usando o estado mais recente,
-      // para que cliques rápidos não dupliquem o item)
-      const productIsAlreadyInCart = prevState.some(
-        (item) => item.id === product.id
-      );
+          // se não -> adicioná-lo
+          return [...prevState, { ...product, quantity: 1 }];
+        });
+      },
 
-      // se sim -> aumentar sua quantidade
-      if (productIsAlreadyInCart) {
-        return prevState.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+      removeProductFromCart: (productId: string) => {
+        setProducts((products) =>
+          products.filter((product) => product.id !== productId)
         );
-      }
+      },
 
-      // se não -> adicioná-lo
-      return [...prevState, { ...product, quantity: 1 }];
-    });
-  };
+      increaseProductQuantity: (productId: string) => {
+        setProducts((products) =>
+          products.map((product) =>
+            product.id === productId
+              ? { ...product, quantity: product.quantity + 1 }
+              : product
+          )
+        );
+      },
 
-  const removeProductFromCart = (productId: string) => {
-    setProducts((products) =>
-      products.filter((product) => product.id !== productId)
-    );
-  };
+      decreaseProductQuantity: (productId: string) => {
+        setProducts((products) =>
+          products
+            .map((product) =>
+              product.id === productId
+                ? { ...product, quantity: product.quantity - 1 }
+                : product
+            )
+            .filter((product) => product.quantity > 0)
+        );
+      },
 
-  const increaseProductQuantity = (productId: string) => {
-    setProducts((products) =>
-      products.map((product) =>
-        product.id === productId
-          ? { ...product, quantity: product.quantity + 1 }
-          : product
-      )
-    );
-  };
+      clearProducts: () => {
+        setProducts([]);
+      },
+    }),
+    []
+  );
 
-  const decreaseProductQuantity = (productId: string) => {
-    setProducts((products) =>
-      products
-        .map((product) =>
-          product.id === productId
-            ? { ...product, quantity: product.quantity - 1 }
-            : product
-        )
-        .filter((product) => product.quantity > 0)
-    );
-  };
-
-  const clearProducts = () => {
-    setProducts([]);
-  };
+  const value = useMemo(
+    () => ({ isVisible, products, productsTotalPrice, productsCount }),
+    [isVisible, products, productsTotalPrice, productsCount]
+  );
 
   return (
-    <CartContext.Provider
-      value={{
-        isVisible,
-        products,
-        productsTotalPrice,
-        productsCount,
-        toggleCart,
-        addProductToCart,
-        removeProductFromCart,
-        increaseProductQuantity,
-        decreaseProductQuantity,
-        clearProducts,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+    <CartActionsContext.Provider value={actions}>
+      <CartContext.Provider value={value}>{children}</CartContext.Provider>
+    </CartActionsContext.Provider>
   );
 };
 

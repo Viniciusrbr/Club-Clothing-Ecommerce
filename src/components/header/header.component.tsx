@@ -4,7 +4,7 @@ import { PiShoppingBag } from 'react-icons/pi'
 
 // Utilities
 import { auth } from '../../config/firebase.config'
-import { CartContext } from '../../contexts/cart.context'
+import { CartActionsContext, CartContext } from '../../contexts/cart.context'
 import { UserContext } from '../../contexts/user.context'
 
 // Styles
@@ -23,7 +23,8 @@ import {
 
 const Header = () => {
   const { isAuthenticated } = useContext(UserContext)
-  const { isVisible, productsCount, toggleCart } = useContext(CartContext)
+  const { isVisible, productsCount } = useContext(CartContext)
+  const { toggleCart } = useContext(CartActionsContext)
 
   const cartLabel =
     productsCount === 1
