@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import Category from '../../types/category.types'
 import CategoryItem from './category-item.component'
 

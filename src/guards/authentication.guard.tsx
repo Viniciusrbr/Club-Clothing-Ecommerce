@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 // Utilities
 import { UserContext } from '../contexts/user.context'

@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect, useState } from 'react'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { BiChevronLeft } from 'react-icons/bi'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 // Utilities
 import { db } from '../../config/firebase.config'

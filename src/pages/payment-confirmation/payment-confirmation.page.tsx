@@ -1,5 +1,5 @@
 import { FunctionComponent, useContext, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router'
 import {
     AiOutlineCheckCircle,
     AiOutlineCloseCircle,

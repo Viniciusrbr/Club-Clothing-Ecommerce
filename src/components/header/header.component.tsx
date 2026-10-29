@@ -1,7 +1,7 @@
 import { signOut } from 'firebase/auth'
 import { useContext } from 'react'
 import { BsCart3 } from 'react-icons/bs'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 // Utilities
 import { auth } from '../../config/firebase.config'

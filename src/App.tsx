@@ -1,6 +1,6 @@
 import { onAuthStateChanged } from 'firebase/auth'
 import { FunctionComponent, useContext, useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 
 // Pages

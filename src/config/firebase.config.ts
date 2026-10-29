@@ -3,12 +3,12 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDzIQtfYd2p8DNW-hUofoAvUyprml8sqys",
-    authDomain: "club-ecommerce-3ba92.firebaseapp.com",
-    projectId: "club-ecommerce-3ba92",
-    storageBucket: "club-ecommerce-3ba92.appspot.com",
-    messagingSenderId: "150739181421",
-    appId: "1:150739181421:web:8915cbc4ab0fda2ef48464"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 export const app = initializeApp(firebaseConfig);

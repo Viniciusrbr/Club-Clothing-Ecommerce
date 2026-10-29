@@ -50,10 +50,24 @@ Instale as dependências:
 npm install
 ```
 
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+Crie um arquivo `.env` na raiz do projeto a partir do `.env.example` e preencha as variáveis:
 ```env
 STRIPE_SECRET_API_KEY=sua_chave_secreta_stripe
 FRONT_END_URL=http://localhost:8888
+
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+> As variáveis `VITE_FIREBASE_*` também precisam ser cadastradas nas variáveis de ambiente do site no Netlify para o deploy funcionar.
+
+Para popular o Firestore com as categorias iniciais, rode o script de seed (lê as mesmas variáveis do `.env`):
+```bash
+node --env-file=.env src/scripts/firestore-script.js
 ```
 
 Execute a aplicação com suporte às funções do Netlify:
