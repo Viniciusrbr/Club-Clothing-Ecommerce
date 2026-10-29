@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router'
 import { UserContext } from '../contexts/user.context'
 
 // Components
-import Header from '../components/header/header.component'
 import Loading from '../components/loading/loading.component'
 
 function AuthenticationGuard({ children }: { children: ReactNode }) {
@@ -25,10 +24,7 @@ function AuthenticationGuard({ children }: { children: ReactNode }) {
 
     if (!isAuthenticated) {
         return (
-            <>
-                <Header />
-                <Loading message="Você precisa estar logado para acessar esta página. Você será redirecionado para a página de login em instantes..." />
-            </>
+            <Loading message="Você precisa estar logado para acessar esta página. Você será redirecionado para a página de login em instantes..." />
         )
     }
 

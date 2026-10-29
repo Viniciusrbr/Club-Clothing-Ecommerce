@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router'
 // Components
 import CustomButton from '../../components/custom-button/custom-button.component'
 import CustomInput from '../../components/custom-input/custom-input.component'
-import Header from '../../components/header/header.component'
 import InputErrorMessage from '../../components/input-error-message/input-error-message.component'
 import Loading from '../../components/loading/loading.component'
 
@@ -125,8 +124,6 @@ const LoginPage = () => {
 
     return (
         <>
-            <Header />
-
             {isLoading && <Loading />}
 
             <AuthContainer id="conteudo">

@@ -1,7 +1,6 @@
 import { onAuthStateChanged } from 'firebase/auth'
 import {
   FunctionComponent,
-  Suspense,
   lazy,
   useContext,
   useEffect,
@@ -33,6 +32,7 @@ import { userConverter } from './converters/firestore.converters'
 // Components
 import Loading from './components/loading/loading.component'
 import Cart from './components/cart/cart.component'
+import Layout from './components/layout/layout.component'
 import AuthenticationGuard from './guards/authentication.guard'
 
 const App: FunctionComponent = () => {
@@ -68,8 +68,8 @@ const App: FunctionComponent = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<Loading />}>
-        <Routes>
+      <Routes>
+        <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/category/:id" element={<CategoryDetailsPage />} />
@@ -88,8 +88,8 @@ const App: FunctionComponent = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
+        </Route>
+      </Routes>
 
       <Cart />
     </BrowserRouter>
